@@ -465,120 +465,7 @@
       .countdown-item { padding: 20px 20px; min-width: 80px; }
     }
 
-    /* ── MINI GAME ── */
-    .game-section {
-      position: relative;
-      z-index: 1;
-      padding: 40px 24px 80px;
-      max-width: 1000px;
-      margin: 0 auto;
-      text-align: center;
-    }
 
-    .game-container {
-      position: relative;
-      background: rgba(255,255,255,0.02);
-      border: 2px solid rgba(212,168,67,0.3);
-      border-radius: 24px;
-      overflow: hidden;
-      width: 100%;
-      height: 400px;
-      margin: 24px 0;
-      cursor: crosshair;
-    }
-
-    .game-gift {
-      position: absolute;
-      font-size: 2.2rem;
-      user-select: none;
-      cursor: pointer;
-      transition: transform 0.08s;
-    }
-
-    .game-gift:hover {
-      transform: scale(1.15);
-    }
-
-    .game-score {
-      display: flex;
-      gap: 32px;
-      justify-content: center;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-
-    .game-score-item {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(212,168,67,0.2);
-      border-radius: 16px;
-      padding: 16px 32px;
-      min-width: 140px;
-    }
-
-    .game-score-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .game-score-value {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--gold-light);
-      margin-top: 6px;
-    }
-
-    .game-controls {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-
-    .btn-game {
-      padding: 14px 32px;
-      border-radius: 12px;
-      border: none;
-      font-family: 'Unbounded', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-game-start {
-      background: linear-gradient(135deg, var(--purple), var(--pink));
-      color: var(--white);
-    }
-
-    .btn-game-start:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(124,58,237,0.4);
-    }
-
-    .btn-game-reset {
-      background: rgba(255,255,255,0.08);
-      color: var(--gold-light);
-      border: 1px solid rgba(212,168,67,0.3);
-    }
-
-    .btn-game-reset:hover {
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(212,168,67,0.6);
-    }
-
-    .btn-game:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    @media (max-width: 500px) {
-      .game-container { height: 300px; }
-      .game-gift { font-size: 1.8rem; }
-    }
   </style>
 </head>
 <body>
@@ -704,35 +591,6 @@
   </div>
 </section>
 
-<!-- ====== MINI GAME ====== -->
-<section class="game-section">
-  <p class="section-label">Поиграем?</p>
-  <h2 class="section-title" style="margin-bottom:12px;">Поймай подарки!</h2>
-  <p style="color: var(--text-muted); margin-bottom: 20px;">Кликай на падающие подарки, стараясь набрать как можно больше очков</p>
-
-  <div class="game-container" id="gameContainer"></div>
-
-  <div class="game-score">
-    <div class="game-score-item">
-      <div class="game-score-label">Очки</div>
-      <div class="game-score-value" id="gameScore">0</div>
-    </div>
-    <div class="game-score-item">
-      <div class="game-score-label">Пропущено</div>
-      <div class="game-score-value" id="gameMissed">0</div>
-    </div>
-    <div class="game-score-item">
-      <div class="game-score-label">Уровень</div>
-      <div class="game-score-value" id="gameLevel">1</div>
-    </div>
-  </div>
-
-  <div class="game-controls">
-    <button class="btn-game btn-game-start" id="gameStartBtn" onclick="startGame()">▶ Начать игру</button>
-    <button class="btn-game btn-game-reset" id="gameResetBtn" onclick="resetGame()" style="display:none;">↻ Сначала</button>
-  </div>
-</section>
-
 <!-- ====== FOOTER ====== -->
 <footer class="footer">
   <div class="footer__logo">С днём рождения, Эмир! 🎂</div>
@@ -741,6 +599,9 @@
   </p>
   <button class="btn-party" onclick="launchConfetti()">
     🎊 Запустить конфетти!
+  </button>
+  <button class="btn-party" onclick="launchGifts()" style="margin-left: 12px;">
+    🎁 Шквал подарков!
   </button>
 </footer>
 
@@ -895,116 +756,67 @@
   // ─── AUTO LAUNCH on load ───
   setTimeout(launchConfetti, 1500);
 
-  // ─── MINI GAME: CATCH GIFTS ───
-  let gameActive = false;
-  let gameScore = 0;
-  let gameMissed = 0;
-  let gameLevel = 1;
-  let gameGifts = [];
-  let gameSpawnRate = 1200;
+  // ─── LAUNCH GIFTS (SHKVАЛ ПОДАРКОВ) ───
+  function launchGifts() {
+    const giftEmojis = ['🎁', '🎀', '🎉', '🎊', '🎈', '🎂'];
+    const giftParticles = Array.from({length: 300}, () => ({
+      x: Math.random() * window.innerWidth,
+      y: -30,
+      vx: (Math.random() - 0.5) * 8,
+      vy: Math.random() * 5 + 3,
+      rot: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 12,
+      emoji: giftEmojis[Math.floor(Math.random() * giftEmojis.length)],
+      alpha: 1,
+      scale: 1
+    }));
 
-  const gameContainer = document.getElementById('gameContainer');
-  const gifts = ['🎁', '🎀', '🎉', '🎊', '🎈', '🎂'];
+    const giftCanvas = document.createElement('canvas');
+    giftCanvas.id = 'gift-canvas';
+    giftCanvas.style.position = 'fixed';
+    giftCanvas.style.inset = '0';
+    giftCanvas.style.zIndex = '11';
+    giftCanvas.style.pointerEvents = 'none';
+    document.body.appendChild(giftCanvas);
 
-  function startGame() {
-    gameActive = true;
-    gameScore = 0;
-    gameMissed = 0;
-    gameLevel = 1;
-    gameSpawnRate = 1200;
-    gameGifts = [];
-    gameContainer.innerHTML = '';
-    updateGameUI();
+    const ctx = giftCanvas.getContext('2d');
+    giftCanvas.width = window.innerWidth;
+    giftCanvas.height = window.innerHeight;
 
-    document.getElementById('gameStartBtn').style.display = 'none';
-    document.getElementById('gameResetBtn').style.display = 'inline-block';
+    function drawGifts() {
+      ctx.clearRect(0, 0, giftCanvas.width, giftCanvas.height);
+      let alive = 0;
 
-    const gameLoop = setInterval(() => {
-      if (!gameActive) {
-        clearInterval(gameLoop);
-        return;
+      giftParticles.forEach(p => {
+        if (p.y > giftCanvas.height + 50) { p.alpha = 0; return; }
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15;
+        p.rot += p.rotSpeed;
+        p.alpha = Math.max(0, p.alpha - 0.003);
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.globalAlpha = p.alpha;
+        ctx.font = 'bold 28px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.emoji, 0, 0);
+        ctx.restore();
+
+        if (p.alpha > 0) alive++;
+      });
+
+      if (alive > 0) {
+        requestAnimationFrame(drawGifts);
+      } else {
+        giftCanvas.remove();
       }
-      spawnGift();
-      gameSpawnRate = Math.max(600, 1200 - gameScore * 2);
-      gameLevel = Math.floor(gameScore / 15) + 1;
-      updateGameUI();
-    }, gameSpawnRate);
-  }
+    }
 
-  function spawnGift() {
-    if (!gameActive) return;
-    const gift = document.createElement('div');
-    const giftEmoji = gifts[Math.floor(Math.random() * gifts.length)];
-    const xPos = Math.random() * (gameContainer.clientWidth - 40);
-    const yPos = -40;
-    const duration = 4000 - gameLevel * 200;
-
-    gift.className = 'game-gift';
-    gift.textContent = giftEmoji;
-    gift.style.left = xPos + 'px';
-    gift.style.top = yPos + 'px';
-    gift.dataset.clicked = false;
-
-    gift.onclick = (e) => {
-      e.stopPropagation();
-      if (gift.dataset.clicked === 'true') return;
-      gift.dataset.clicked = 'true';
-      gameScore++;
-      gift.style.transform = 'scale(0)';
-      setTimeout(() => gift.remove(), 200);
-    };
-
-    gameContainer.appendChild(gift);
-
-    let startTime = Date.now();
-    const moveGift = setInterval(() => {
-      if (!gameActive) {
-        clearInterval(moveGift);
-        return;
-      }
-      const elapsed = Date.now() - startTime;
-      const progress = elapsed / duration;
-
-      if (progress >= 1) {
-        if (gift.dataset.clicked !== 'true') {
-          gameMissed++;
-          if (gameMissed >= 5) {
-            endGame();
-          }
-        }
-        clearInterval(moveGift);
-        gift.remove();
-        return;
-      }
-
-      gift.style.top = (yPos + progress * (gameContainer.clientHeight + 40)) + 'px';
-    }, 16);
-  }
-
-  function updateGameUI() {
-    document.getElementById('gameScore').textContent = gameScore;
-    document.getElementById('gameMissed').textContent = gameMissed;
-    document.getElementById('gameLevel').textContent = gameLevel;
-  }
-
-  function endGame() {
-    gameActive = false;
-    document.getElementById('gameStartBtn').style.display = 'inline-block';
-    document.getElementById('gameResetBtn').style.display = 'inline-block';
-    document.getElementById('gameStartBtn').textContent = 'Начать заново';
-    gameContainer.innerHTML = '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2rem; font-weight:700; color:var(--gold-light);">Игра окончена! Счёт: ' + gameScore + '</div>';
-  }
-
-  function resetGame() {
-    gameActive = false;
-    gameScore = 0;
-    gameMissed = 0;
-    gameLevel = 1;
-    gameContainer.innerHTML = '';
-    updateGameUI();
-    document.getElementById('gameStartBtn').textContent = '▶ Начать игру';
-    document.getElementById('gameStartBtn').style.display = 'inline-block';
-    document.getElementById('gameResetBtn').style.display = 'none';
+    drawGifts();
   }
 </script>
 </body>
